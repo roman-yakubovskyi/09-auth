@@ -4,21 +4,16 @@ import css from './NoteForm.module.css';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Note, NoteFormValues, NoteTag } from '@/types/note';
-import { useMutation } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { createNote } from '@/lib/api/clientApi';
 import { useNoteDraftStore } from '@/lib/store/noteStore';
 
 export default function NoteForm() {
   const router = useRouter();
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const queryClient = useQueryClient();
-
   const { draft, setDraft, clearDraft } = useNoteDraftStore();
-
   const handleChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -27,30 +22,27 @@ export default function NoteForm() {
     const { name, value } = event.target;
     setDraft({ ...draft, [name]: value });
   };
-
   const mutationCreateNote = useMutation({
-    mutationFn: async (note: NoteFormValues) => {
+    mutationFn: (note: NoteFormValues) => createNote(note),
+    onMutate: () => {
       setIsSubmitting(true);
-      const noteNew = await createNote(note);
-      return noteNew;
     },
     onSuccess: (noteNew: Note) => {
       toast.success(`Create note: ${noteNew.title} success !`);
-      setIsSubmitting(false);
       clearDraft();
       closeForm();
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
     onError: (error: Error) => {
       toast.error(`Created ERROR ${error.message}`);
+    },
+    onSettled: () => {
       setIsSubmitting(false);
     },
   });
-
   const closeForm = () => {
     router.back();
   };
-
   const handleSubmit = (formData: FormData) => {
     const values: NoteFormValues = {
       title: formData.get('title') as string,
@@ -59,7 +51,6 @@ export default function NoteForm() {
     };
     mutationCreateNote.mutate(values);
   };
-
   return (
     <form action={handleSubmit} className={css.form}>
       <div className={css.formGroup}>
@@ -74,7 +65,6 @@ export default function NoteForm() {
           autoFocus
         />
       </div>
-
       <div className={css.formGroup}>
         <label htmlFor="content">Content</label>
         <textarea
@@ -86,7 +76,6 @@ export default function NoteForm() {
           className={css.textarea}
         />
       </div>
-
       <div className={css.formGroup}>
         <label htmlFor="tag">Tag</label>
         <select
@@ -103,18 +92,10 @@ export default function NoteForm() {
           <option value="Shopping">Shopping</option>
         </select>
       </div>
-
       <div className={css.actions}>
-        <button
-          type="button"
-          className={css.cancelButton}
-          onClick={() => {
-            closeForm();
-          }}
-        >
+        <button type="button" className={css.cancelButton} onClick={closeForm}>
           Cancel
         </button>
-
         <button
           type="submit"
           className={css.submitButton}

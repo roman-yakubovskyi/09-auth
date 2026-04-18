@@ -2,8 +2,7 @@
 
 import css from './NotePreview.module.css';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Modal from '@/components/Modal/Modal';
 import { fetchNoteById } from '@/lib/api/clientApi';
 
@@ -13,15 +12,36 @@ const NotePreviewClient = () => {
   const closeModal = () => router.back();
   const {
     data: note,
-    // isLoading,
+    isLoading,
+    isError,
     error,
   } = useQuery({
     queryKey: ['note', id],
     queryFn: () => fetchNoteById(id),
+    enabled: !!id,
     refetchOnMount: false,
   });
-  if (error || !note) return <p>Something went wrong.</p>;
-  //     ? `Updated at: ${note.updatedAt}`
+  if (isLoading) {
+    return (
+      <Modal onClose={closeModal}>
+        <p>Loading...</p>
+      </Modal>
+    );
+  }
+  if (isError) {
+    return (
+      <Modal onClose={closeModal}>
+        <p>Error: {(error as Error).message}</p>
+      </Modal>
+    );
+  }
+  if (!note) {
+    return (
+      <Modal onClose={closeModal}>
+        <p>Note not found.</p>
+      </Modal>
+    );
+  }
   return (
     <Modal onClose={closeModal}>
       <div className={css.container}>

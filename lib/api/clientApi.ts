@@ -8,7 +8,6 @@ export interface NewUser {
 }
 
 export interface EditUser {
-  email: string;
   username: string;
 }
 
@@ -54,6 +53,7 @@ interface GetNotesHttpResponse {
   notes: Note[];
   totalPages: number;
 }
+
 type GetNotesByIdHttpResponse = Note;
 type DeleteNotesHttpResponse = Note;
 type PostNotesHttpResponse = Note;
@@ -63,30 +63,17 @@ export async function fetchNotes(
   tag: string = 'all',
   pageCurrent: number = 1
 ): Promise<GetNotesHttpResponse> {
-  let options;
-  if (tag === 'all') {
-    options = {
-      params: {
-        search: nameSearch,
-        page: pageCurrent,
-        perPage: 12,
-      },
-    };
-  } else {
-    options = {
-      params: {
-        search: nameSearch,
-        page: pageCurrent,
-        tag: tag,
-        perPage: 12,
-      },
-    };
+  const params: Record<string, string | number> = {
+    search: nameSearch,
+    page: pageCurrent,
+    perPage: 12,
+  };
+  if (tag !== 'all') {
+    params.tag = tag;
   }
-
-  const response = await nextServer.get<GetNotesHttpResponse>(
-    '/notes',
-    options
-  );
+  const response = await nextServer.get<GetNotesHttpResponse>('/notes', {
+    params,
+  });
   return {
     notes: response.data.notes,
     totalPages: response.data.totalPages,
@@ -96,27 +83,25 @@ export async function fetchNotes(
 export async function fetchNoteById(
   noteId: string
 ): Promise<GetNotesByIdHttpResponse> {
-  if (noteId !== '') {
-    const response = await nextServer.get<GetNotesByIdHttpResponse>(
-      `/notes/${noteId}`
-    );
-    return response.data;
-  } else {
-    throw new Error('Note ID is required for deletion');
+  if (!noteId) {
+    throw new Error('Note ID is required to fetch a note');
   }
+  const response = await nextServer.get<GetNotesByIdHttpResponse>(
+    `/notes/${noteId}`
+  );
+  return response.data;
 }
 
 export async function deleteNote(
   noteId: string
 ): Promise<DeleteNotesHttpResponse> {
-  if (noteId !== '') {
-    const response = await nextServer.delete<DeleteNotesHttpResponse>(
-      `/notes/${noteId}`
-    );
-    return response.data;
-  } else {
+  if (!noteId) {
     throw new Error('Note ID is required for deletion');
   }
+  const response = await nextServer.delete<DeleteNotesHttpResponse>(
+    `/notes/${noteId}`
+  );
+  return response.data;
 }
 
 export async function createNote(
