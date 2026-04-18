@@ -14,7 +14,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('http://localhost:3000'),
+  metadataBase: new URL('https://09-auth-nine-topaz.vercel.app/'),
   title: 'NoteHub',
   description:
     'NoteHub - Your Personal Note-Taking App - Powered by Next.js and React Query',
