@@ -5,7 +5,7 @@ import {
   dehydrate,
 } from '@tanstack/react-query';
 import NotesPage from './Notes.client';
-import { fetchNotesByTag } from '@/lib/api';
+import { fetchNotes } from '@/lib/api/serverApi';
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `Notes`,
       description: `Notes in NoteHub, filtered by ${slug[0]}`,
-      url: `https://08-zustand-f8m2.vercel.app/${slug[0]}`,
+      url: `/notes/filter/${slug[0]}`,
       siteName: 'NoteHub',
       images: [
         {
@@ -47,7 +47,7 @@ export default async function Notes({ params }: Props) {
 
   await queryClient.prefetchQuery({
     queryKey: ['notes', query, tag, page],
-    queryFn: () => fetchNotesByTag(query, tag, page),
+    queryFn: () => fetchNotes(query, tag, page),
   });
 
   return (

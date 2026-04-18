@@ -6,7 +6,7 @@ import css from './Notes.module.css';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import NoteList from '@/components/NoteList/NoteList';
 import Pagination from '@/components/Pagination/Pagination';
-import { fetchNotesByTag } from '@/lib/api';
+import { fetchNotes } from '@/lib/api/clientApi';
 import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '@tanstack/react-query';
 import { useDebouncedCallback } from 'use-debounce';
@@ -24,7 +24,7 @@ const NotesPage = ({ tag }: NotePageProps) => {
 
   const { data } = useQuery({
     queryKey: ['notes', query, tag, page],
-    queryFn: async () => fetchNotesByTag(query, tag, page),
+    queryFn: async () => fetchNotes(query, tag, page),
     placeholderData: keepPreviousData,
     refetchOnMount: true,
   });

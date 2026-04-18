@@ -1,24 +1,26 @@
 import './globals.css';
-import type { Metadata } from 'next';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import { Roboto } from 'next/font/google';
+import type { Metadata } from 'next';
+import AuthProvider from '@/components/AuthProvider/AuthProvider';
 
 const roboto = Roboto({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-roboto',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('http://localhost:3000'),
   title: 'NoteHub',
   description:
     'NoteHub - Your Personal Note-Taking App - Powered by Next.js and React Query',
   openGraph: {
     title: `NoteHub`,
     description: 'NoteHub - Your Personal Note',
-    url: `https://08-zustand-f8m2.vercel.app/`,
     siteName: 'NoteHub',
     images: [
       {
@@ -43,12 +45,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.variable}>
         <TanStackProvider>
-          <Header />
-          <main>
+          <AuthProvider>
+            <Header />
             {children}
             {modal}
-          </main>
-          <Footer />
+            <Footer />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>

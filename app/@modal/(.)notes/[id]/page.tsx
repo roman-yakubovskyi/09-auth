@@ -5,7 +5,7 @@ import {
   dehydrate,
 } from '@tanstack/react-query';
 import NotePreviewClient from './NotePreview.client';
-import { fetchNoteById } from '@/lib/api';
+import { fetchNoteById } from '@/lib/api/serverApi';
 
 export const metadata: Metadata = {
   title: 'Note Details',

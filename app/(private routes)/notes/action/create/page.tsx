@@ -5,13 +5,10 @@ import NoteForm from '@/components/NoteForm/NoteForm';
 export const metadata: Metadata = {
   title: 'Create Note',
   description: 'Create New Note in NoteHub',
-  metadataBase: new URL(
-    'https://08-zustand-f8m2.vercel.app/notes/action/create'
-  ),
   openGraph: {
     title: `Create Note`,
     description: 'Create New Note in NoteHub',
-    url: `https://08-zustand-f8m2.vercel.app/notes/action/create`,
+    url: `/notes/action/create`,
     siteName: 'NoteHub',
     images: [
       {
