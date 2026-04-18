@@ -22,16 +22,22 @@ function parseSetCookie(cookieStr: string) {
       options.path = val || '/';
     }
     if (key === 'expires' && val) {
-      options.expires = new Date(val);
+      const date = new Date(val);
+      if (!isNaN(date.getTime())) {
+        options.expires = date;
+      }
     }
     if (key === 'max-age' && val) {
-      options.maxAge = Number(val);
+      const maxAge = Number(val);
+      if (!isNaN(maxAge)) {
+        options.maxAge = maxAge;
+      }
     }
   }
   return { name, value, options };
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
@@ -49,6 +55,7 @@ export async function middleware(request: NextRequest) {
         : NextResponse.next();
       for (const cookieStr of cookieArray) {
         const { name, value, options } = parseSetCookie(cookieStr);
+        if (!name || !value) continue;
         response.cookies.set(name, value, {
           path: options.path ?? '/',
           expires: options.expires,
